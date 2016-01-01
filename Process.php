@@ -60,6 +60,7 @@ class Process
     private $stdout;
     private $stderr;
     private $enhanceWindowsCompatibility = true;
+    private $useWindowsVariableExpansion = false;
     private $enhanceSigchildCompatibility;
     private $process;
     private $status = self::STATUS_READY;
@@ -268,7 +269,8 @@ class Process
         $commandline = $this->commandline;
 
         if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
-            $commandline = 'cmd /V:ON /E:ON /D /C "('.$commandline.')';
+            $expansion = $this->useWindowsVariableExpansion ? '/V:ON' : '';
+            $commandline = 'cmd '.$expansion.' /E:ON /D /C "('.$commandline.')';
             foreach ($this->processPipes->getFiles() as $offset => $filename) {
                 $commandline .= ' '.$offset.'>'.ProcessUtils::escapeArgument($filename);
             }
